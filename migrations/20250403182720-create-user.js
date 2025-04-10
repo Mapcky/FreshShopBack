@@ -20,8 +20,12 @@ module.exports = {
       },
       first_name: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
+      image_url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },      
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      product_name: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -28,6 +28,10 @@ module.exports = {
           min: 0,
         },
       },
+      image_url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },    
       category_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -38,7 +42,7 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
         index: true,
-      },
+      },  
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
