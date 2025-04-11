@@ -23,8 +23,6 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10)
         const hash = await bcrypt.hash(password, salt)
 
-        console.log(hash)
-
         // new user
         const _ = await models.User.create({
             username: username,

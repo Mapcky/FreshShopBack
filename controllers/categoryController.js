@@ -23,7 +23,6 @@ exports.createCategory = async (req, res) => {
             return res.json({ message: "Category already exists", success: false })
         }
 
-        // new user
         const _ = await models.Category.create({
             name: name,
             image_url: image_url
