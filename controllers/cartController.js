@@ -1,7 +1,7 @@
 const models = require('../models')
 
 
-exports.loadCart = async(req, res) => {
+exports.loadCart = async (req, res) => {
     try {
         const userId = 1//hardcoded req.userId
 
@@ -20,7 +20,7 @@ exports.loadCart = async(req, res) => {
                         {
                             model: models.Product,
                             as: 'Product',
-                            attributes: ['id', 'name', 'price', 'image_url', 'category_id']
+                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity']
                         }
                     ]
                 }
@@ -55,17 +55,27 @@ exports.addCartItem = async (req, res) => {
             }
         })
 
-        const [cartItem, created] = await models.cartItem.findOrCreate({
-          where: {
-            cart_id: cart.id,
-            product_id: productId
-          },
-          defaults: { quantity }
+        const [cartItem, created] = await models.CartItem.findOrCreate({
+            where: {
+                cart_id: cart.id,
+                product_id: productId
+            },
+            defaults: { quantity }
         })
+
+        const product = await models.Product.findByPk(productId)
 
         if (!created) {
             //item already exists
-            cartItem.quantity += quantity
+
+            //don't want to superpass the product stock, temporal solution
+            const avaliableStock = product.quantity - cartItem.quantity
+
+            if (avaliableStock > 0) {
+                cartItem.quantity += quantity
+            } else {
+                cartItem.quantity = product.quantity
+            }
             //save it
             await cartItem.save()
         }
@@ -81,14 +91,38 @@ exports.addCartItem = async (req, res) => {
                 {
                     model: models.Product,
                     as: 'Product',
-                    attributes: ['id', 'name', 'price', 'image_url', 'category_id']
+                    attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity']
                 }
             ]
         })
 
         res.status(201).json({ message: 'cart item added', success: true, cartItem: cartItemResponse })
 
-    } catch {
-        return res.status(500).json({ message: 'An error ocurred while loading the cart', success: false })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: 'An error ocurred while adding an item to the cart', success: false })
+    }
+}
+
+
+exports.removeCartItem = async (req, res) => {
+    try {
+
+        const { cartItemId } = req.params
+
+        const deletedItem = await models.CartItem.destroy({
+            where: {
+                id: cartItemId
+            }
+        })
+
+        if (!deletedItem) {
+            return res.status(404).json({ message: 'Cart item not found', success: false})
+        }
+
+        res.status(200).json({ success: true })
+
+    } catch (error) {
+        return res.status(500).json({ message: 'An error ocurred while removing the cart item', success: false})
     }
 }
