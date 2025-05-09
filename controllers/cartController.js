@@ -1,3 +1,4 @@
+const { Transaction } = require('sequelize')
 const models = require('../models')
 
 
@@ -125,4 +126,12 @@ exports.removeCartItem = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: 'An error ocurred while removing the cart item', success: false})
     }
+}
+
+
+exports.cleanCart = async (cartId, transaction) => {
+    return await models.CartItem.destroy({
+        where: {cart_id: cartId},
+        transaction
+    })
 }
