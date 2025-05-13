@@ -1,5 +1,6 @@
 const models = require('../models')
 const cartController = require('./cartController')
+const productController = require('./productController')
 
 
 exports.createOrder = async (req,res) => {
@@ -25,6 +26,14 @@ exports.createOrder = async (req,res) => {
 
         await models.OrderItem.bulkCreate(newOrderItems, { transaction })
 
+
+        const stockUpdateData = newOrderItems.map(({ product_id, quantity }) => ({
+            productId: product_id,
+            quantity
+        }))
+
+        await productController.updateProductStock(stockUpdateData, transaction)
+
         const cart = await models.Cart.findOne({
             where: {
                 user_id: userId
@@ -40,6 +49,7 @@ exports.createOrder = async (req,res) => {
 
 
     } catch (error) {
+        console.log(error)
         transaction.rollback()
         return res.status(500).json({ message: 'Internal server error', success: false})
     }

@@ -35,7 +35,7 @@ exports.createProduct = async (req, res) => {
 exports.getFromCategory = async (req, res) => {
     try {
         const categoryId = req.params.categoryId
-        
+
         const products = await models.Product.findAll({
             where: {
                 category_id: categoryId
@@ -47,5 +47,51 @@ exports.getFromCategory = async (req, res) => {
 
     } catch {
         return res.status(500).json({ message: 'Internal server error', success: false })
+    }
+}
+
+
+exports.updateProductStock = async (updateData, transaction) => {
+    try {
+
+        const productIds = updateData.map(item => item.productId)
+
+
+        const products = await models.Product.findAll({
+            where: { id: productIds },
+            transaction
+        })
+
+        const productMap = products.reduce((acc, product) => {
+            acc[product.id] = product
+            return acc
+        }, {})
+
+
+        for (const item of updateData) {
+            const product = productMap[item.productId]
+
+            if (!product) {
+                throw new Error('Product not found')
+            }
+
+            if (product.quantity < item.quantity) {
+                throw new Error('Insufficent stock')
+            }
+
+            product.quantity -= item.quantity
+
+            await models.Product.update(
+                { quantity: product.quantity },
+                { where: { id: product.id }, transaction }
+            )
+        }
+
+        return { success: true }
+
+
+    } catch (error) {
+        console.error(error.message)
+        throw error
     }
 }

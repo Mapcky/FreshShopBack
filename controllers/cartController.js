@@ -1,4 +1,3 @@
-const { Transaction } = require('sequelize')
 const models = require('../models')
 
 
