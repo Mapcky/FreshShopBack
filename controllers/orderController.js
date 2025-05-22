@@ -3,11 +3,11 @@ const cartController = require('./cartController')
 const productController = require('./productController')
 
 
-exports.createOrder = async (req,res) => {
+exports.createOrder = async (req, res) => {
 
     const userId = 1 //hardcoded
-    
-    const { order_items } = req.body
+
+    const { order_items, total } = req.body
 
     const transaction = await models.Order.sequelize.transaction()
 
@@ -15,7 +15,8 @@ exports.createOrder = async (req,res) => {
     try {
 
         const newOrder = await models.Order.create({
-            user_id: userId
+            user_id: userId,
+            total: total
         }, { transaction })
 
         const newOrderItems = order_items.map(item => ({
@@ -51,7 +52,45 @@ exports.createOrder = async (req,res) => {
     } catch (error) {
         console.log(error)
         transaction.rollback()
-        return res.status(500).json({ message: 'Internal server error', success: false})
+        return res.status(500).json({ message: 'Internal server error', success: false })
+    }
+
+}
+
+
+exports.loadOrders = async (req, res) => {
+
+    const userId = 1 //hardcoded
+
+    try {
+
+        const orders = await models.Order.findAll({
+            where: {
+                user_id: userId
+            },
+            attributes: ['id', 'user_id', 'status','total'],
+            include: [
+                {
+                    model: models.OrderItem,
+                    as: 'orderItems',
+                    attributes: ['id', 'order_id', 'product_id','quantity'],
+                    include: [
+                        {
+                            model: models.Product,
+                            as: 'Product',
+                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity']
+                        }
+                    ]
+                }
+            ]
+        })
+
+        res.status(200).json({ orders, success: true})
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: 'Internal server error', success: false })
+
     }
 
 }

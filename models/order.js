@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Order.belongsTo(models.User, { foreignKey: "user_id" });
+      Order.hasMany(models.OrderItem, { foreignKey: "order_id", as: "orderItems" });
+
     }
   }
   Order.init({
@@ -19,6 +21,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM("pending", "shipped", "delivered", "cancelled"),
       allowNull: false,
       defaultValue: "pending"
+    },
+    total: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0.00,
     }
   }, {
     sequelize,

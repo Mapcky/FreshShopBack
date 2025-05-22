@@ -7,10 +7,9 @@ exports.loadCart = async (req, res) => {
 
         let cart = await models.Cart.findOne({
             where: {
-                user_id: userId,
-                is_active: true
+                user_id: userId
             },
-            attributes: ['id', 'user_id', 'is_active'],
+            attributes: ['id', 'user_id'],
             include: [
                 {
                     model: models.CartItem,
@@ -29,8 +28,7 @@ exports.loadCart = async (req, res) => {
 
         if (!cart) {
             cart = await models.Cart.create({
-                user_id: userId,
-                is_active: true
+                user_id: userId
             })
         }
 
@@ -50,8 +48,7 @@ exports.addCartItem = async (req, res) => {
 
         const cart = await models.Cart.findOne({
             where: {
-                user_id: userId,
-                is_active: true
+                user_id: userId
             }
         })
 
