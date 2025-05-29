@@ -68,7 +68,7 @@ exports.loadOrders = async (req, res) => {
             where: {
                 user_id: userId
             },
-            attributes: ['id', 'user_id', 'status','total'],
+            attributes: ['id', 'user_id', 'status','total','createdAt'],
             include: [
                 {
                     model: models.OrderItem,
