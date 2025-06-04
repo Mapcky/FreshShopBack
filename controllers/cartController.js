@@ -3,7 +3,8 @@ const models = require('../models')
 
 exports.loadCart = async (req, res) => {
     try {
-        const userId = 1//hardcoded req.userId
+
+        const userId = req.userId;
 
         let cart = await models.Cart.findOne({
             where: {
@@ -41,7 +42,7 @@ exports.loadCart = async (req, res) => {
 
 exports.addCartItem = async (req, res) => {
 
-    const userId = 1//hardcoded req.userId get from middleware
+    const userId = req.userId
     const { productId, quantity } = req.body
 
     try {

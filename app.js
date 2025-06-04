@@ -20,10 +20,10 @@ app.use('/api/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/api/auth', authRoutes)
 app.use('/api/category', categoryRoutes)
 app.use('/api/product', productRoutes)
-app.use('/api/cart',cartRoutes)
-app.use('/api/order', orderRoutes)
+app.use('/api/cart',authenticate,cartRoutes)
+app.use('/api/order',authenticate, orderRoutes)
 app.use('/api/pay', paymentRoutes)
-app.use('/api/address', addressRoutes)
+app.use('/api/address',authenticate, addressRoutes)
 
 app.listen(8080, () => {
     console.log('Server is running')

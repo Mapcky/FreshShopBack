@@ -42,32 +42,35 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
 
     try {
-        
-    const { username, password } = req.body
 
-    // check if user exists
-    const existingUser = await models.User.findOne({
-        where: {
-            username: { [Op.iLike]: username }
+        const { username: inputUsername, password } = req.body
+
+        // check if user exists
+        const existingUser = await models.User.findOne({
+            where: {
+                username: { [Op.iLike]: inputUsername }
+            }
+        })
+
+        if (!existingUser) {
+            return res.json({ message: "Username or password is incorrect", success: false })
         }
-    })
 
-    if (!existingUser) {
-        return res.json({ message: "Username or password is incorrect", success: false })
-    }
+        // check the passsword
+        const isPasswordValid = await bcrypt.compare(password, existingUser.password)
+        if (!isPasswordValid) {
+            return res.json({ message: "Username or password is incorrect", success: false })
+        }
 
-    // check the passsword
-    const isPasswordValid = await bcrypt.compare(password, existingUser.password)
-    if(!isPasswordValid) {
-        return res.json({ message: "Username or password is incorrect", success: false })
-    }
+        const { id, username, first_name, image_url } = existingUser
+        const user = { id, username, first_name, image_url }
 
-    // generate JWT token
-    const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET, {
-        expiresIn: '1h'
-    })
+        // generate JWT token
+        const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET, {
+            expiresIn: '1h'
+        })
 
-    return res.status(200).json({ userId: existingUser.id, username: existingUser.username, token, success: true })
+        return res.status(200).json({ user: user, token, success: true })
 
     } catch (error) {
         res.status(500).json({ message: "Internal server error.", success: false })

@@ -3,17 +3,17 @@ const models = require('../models')
 
 exports.setNewAddress = async (req, res) => {
 
-    const userId = 1 //hardcode
+    const userId = req.userId
 
-    const { street, city, state, country, zip } = req.body
+    const { street, city, state, country, zip, isDefault } = req.body
 
     try {
 
-        const existingAddresses = await models.Address.findAll({
-            where: { user_id: userId }
-        })
+        //const existingAddresses = await models.Address.findAll({
+        //    where: { user_id: userId }
+        //})
 
-        const isDefault = existingAddresses.length === 0
+        //const isDefault = existingAddresses.length === 0
 
         const newAddress = await models.Address.create({
             street: street,
@@ -38,14 +38,15 @@ exports.setNewAddress = async (req, res) => {
 
 exports.getAddresses = async (req, res) => {
 
-    const userId = 1 //hardcoded
+    const userId = req.userId
 
     try {
 
     const userAddresses = await models.Address.findAll({
         where: {
             user_id: userId
-        }
+        },
+        attributes: ['id','street','city','state','country','zip','isDefault']
     })
 
     if (userAddresses.length === 0) {

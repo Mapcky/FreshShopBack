@@ -5,7 +5,7 @@ const productController = require('./productController')
 
 exports.createOrder = async (req, res) => {
 
-    const userId = 1 //hardcoded
+    const userId = req.userId
 
     const { order_items, total } = req.body
 
@@ -60,7 +60,7 @@ exports.createOrder = async (req, res) => {
 
 exports.loadOrders = async (req, res) => {
 
-    const userId = 1 //hardcoded
+    const userId = req.userId
 
     try {
 
