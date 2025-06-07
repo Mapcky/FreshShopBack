@@ -78,7 +78,7 @@ exports.loadOrders = async (req, res) => {
                         {
                             model: models.Product,
                             as: 'Product',
-                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity']
+                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity','description']
                         }
                     ]
                 }

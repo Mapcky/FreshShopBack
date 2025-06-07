@@ -8,7 +8,7 @@ const { Op } = require('sequelize')
 exports.register = async (req, res) => {
 
     try {
-        const { username, password, first_name } = req.body
+        const { username, password, first_name, last_name, email } = req.body
 
         const existingUser = await models.User.findOne({
             where: {
@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
         })
 
         if (existingUser) {
-            return res.json({ message: "Username taken!", success: false })
+            return res.status(409).json({ message: "Username taken!", success: false })
         }
 
         //password hash
@@ -25,12 +25,19 @@ exports.register = async (req, res) => {
         const hash = await bcrypt.hash(password, salt)
 
         // new user
-        const _ = await models.User.create({
+        const newUser = await models.User.create({
             username: username,
             password: hash,
-            first_name: first_name
+            first_name: first_name,
+            last_name: last_name,
+            email: email
         })
-        res.status(201).json({ success: "true" })
+
+        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, {
+            expiresIn: '1h'
+        })
+
+        res.status(201).json({ user: newUser, token, success: true })
 
 
     } catch (error) {
@@ -62,8 +69,8 @@ exports.login = async (req, res) => {
             return res.json({ message: "Username or password is incorrect", success: false })
         }
 
-        const { id, username, first_name, image_url } = existingUser
-        const user = { id, username, first_name, image_url }
+        const { id, username, first_name, last_name, image_url, email } = existingUser
+        const user = { id, username, first_name, last_name, image_url, email }
 
         // generate JWT token
         const token = jwt.sign({ userId: existingUser.id }, process.env.JWT_SECRET, {
@@ -75,5 +82,19 @@ exports.login = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Internal server error.", success: false })
     }
+}
+
+exports.loginById = async (req, res) => {
+
+    const user = await models.User.findByPk(req.userId, {
+        attributes: ['id', 'username', 'first_name', 'last_name', 'image_url', 'email']
+    });
+
+    if (!user) {
+        return res.status(404).json({ message: 'User not found', success: false });
+    }
+
+    return res.status(200).json({ user: user, success: true });
+
 }
 

@@ -40,7 +40,7 @@ exports.getFromCategory = async (req, res) => {
             where: {
                 category_id: categoryId
             },
-            attributes: ['id', 'name', 'price', 'quantity', 'image_url', 'category_id']
+            attributes: ['id', 'name', 'price', 'quantity', 'image_url', 'category_id','description', 'rate']
         })
 
         res.status(200).json({ products, success: true })
