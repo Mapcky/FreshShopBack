@@ -40,7 +40,7 @@ exports.getFromCategory = async (req, res) => {
             where: {
                 category_id: categoryId
             },
-            attributes: ['id', 'name', 'price', 'quantity', 'image_url', 'category_id','description', 'rate']
+            attributes: ['id', 'name', 'price', 'quantity', 'image_url', 'category_id', 'description', 'rate']
         })
 
         res.status(200).json({ products, success: true })
@@ -93,5 +93,23 @@ exports.updateProductStock = async (updateData, transaction) => {
     } catch (error) {
         console.error(error.message)
         throw error
+    }
+}
+
+
+exports.getTopRatedProducts = async (req, res) => {
+    try {
+        const topProducts = await models.Product.findAll({
+            where: 
+            {rate: { [Op.not]: null }
+        },
+        order: [['rate', 'DESC']],
+        limit: 10
+        })
+
+        res.status(200).json({ products: topProducts, success: true })
+
+    } catch {
+        res.status(500).json({ message: "Error retrieving top rated products", success: false })
     }
 }

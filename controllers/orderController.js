@@ -45,8 +45,26 @@ exports.createOrder = async (req, res) => {
 
         await transaction.commit()
 
+        const fullOrder = await models.Order.findByPk(newOrder.id, {
+            attributes: ['id', 'user_id', 'status', 'total', 'createdAt'],
+            include: [
+                {
+                    model: models.OrderItem,
+                    as: 'orderItems',
+                    attributes: ['id', 'order_id', 'product_id', 'quantity'],
+                    include: [
+                        {
+                            model: models.Product,
+                            as: 'Product',
+                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity', 'description']
+                        }
+                    ]
+                }
+            ]
+        });
 
-        return res.status(200).json({ success: true })
+
+        return res.status(201).json({ order: fullOrder, success: true })
 
 
     } catch (error) {
@@ -68,24 +86,24 @@ exports.loadOrders = async (req, res) => {
             where: {
                 user_id: userId
             },
-            attributes: ['id', 'user_id', 'status','total','createdAt'],
+            attributes: ['id', 'user_id', 'status', 'total', 'createdAt'],
             include: [
                 {
                     model: models.OrderItem,
                     as: 'orderItems',
-                    attributes: ['id', 'order_id', 'product_id','quantity'],
+                    attributes: ['id', 'order_id', 'product_id', 'quantity'],
                     include: [
                         {
                             model: models.Product,
                             as: 'Product',
-                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity','description']
+                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity', 'description']
                         }
                     ]
                 }
             ]
         })
 
-        res.status(200).json({ orders, success: true})
+        res.status(200).json({ orders, success: true })
 
     } catch (error) {
         console.log(error)
