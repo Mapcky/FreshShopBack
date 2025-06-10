@@ -1,14 +1,19 @@
-const localConfig = require('./config.json');
+require('dotenv').config();
 
 module.exports = {
-  development: localConfig,
+  development: {
+    username: process.env.DB_LOCAL_USER,
+    password: process.env.DB_LOCAL_PASS,
+    database: process.env.DB_LOCAL_NAME,
+    host: process.env.DB_LOCAL_HOST,
+    dialect: 'postgres',
+  },
   production: {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     dialect: 'postgres',
-        ssl: true,
     dialectOptions: {
       ssl: {
         require: true,

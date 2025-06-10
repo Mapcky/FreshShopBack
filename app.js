@@ -12,9 +12,9 @@ const addressRoutes = require('./routes/address')
 const authenticate = require('./middlewares/authMiddleware')
 const path = require('path');
 
-app.use(cors());
-const app = express()
 
+const app = express()
+app.use(cors());
 app.use(express.json())
 
 
