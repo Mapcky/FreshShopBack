@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+
 module.exports = {
   development: {
     username: process.env.DB_LOCAL_USER,
