@@ -25,7 +25,7 @@ app.use('/api/category', categoryRoutes)
 app.use('/api/product', productRoutes)
 app.use('/api/cart',authenticate,cartRoutes)
 app.use('/api/order',authenticate, orderRoutes)
-app.use('/api/pay',authenticate, paymentRoutes)
+app.use('/api/pay', paymentRoutes)
 app.use('/api/address',authenticate, addressRoutes)
 /*
 app.listen(8080, () => {
