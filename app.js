@@ -9,6 +9,7 @@ const cartRoutes = require('./routes/cart')
 const orderRoutes = require('./routes/order')
 const paymentRoutes = require('./routes/payment')
 const addressRoutes = require('./routes/address')
+const dealRoutes = require('./routes/deal')
 const authenticate = require('./middlewares/authMiddleware')
 const path = require('path');
 
@@ -27,6 +28,7 @@ app.use('/api/cart',authenticate,cartRoutes)
 app.use('/api/order',authenticate, orderRoutes)
 app.use('/api/pay', authenticate,paymentRoutes)
 app.use('/api/address',authenticate, addressRoutes)
+app.use('/api/deal',dealRoutes)
 /*
 app.listen(8080, () => {
     console.log('Server is running')
