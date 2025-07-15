@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 
 exports.create = async (req, res) => {
 
-    const { name, starting_date, finish_date, type } = req.body
+    const { name, starting_date, finish_date, type, image_url } = req.body
 
     try {
 
@@ -12,7 +12,8 @@ exports.create = async (req, res) => {
             name: name,
             starting_date: starting_date,
             finish_date: finish_date,
-            type: type
+            type: type,
+            image_url: image_url
         })
 
         res.status(201).json({ message: "Deal created", success: true })
@@ -52,10 +53,16 @@ exports.getActiveDeals = async (req, res) => {
                 starting_date: { [Op.lte]: now },
                 finish_date: { [Op.gte]: now }
             },
+            attributes: ['id', 'name', 'starting_date', 'finish_date', 'type', 'image_url'],
             include: [{
                 model: models.DealItem,
                 as: 'items',
-                attributes: ['id', 'product_id', 'value']
+                attributes: ['id', 'deal_id', 'product_id', 'value'],
+                include: [{
+                    model: models.Product,
+                    as: 'Product',
+                    attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity', 'description']
+                }]
             }]
         });
 

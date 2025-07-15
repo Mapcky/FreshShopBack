@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     starting_date: DataTypes.DATE,
     finish_date: DataTypes.DATE,
-    type: DataTypes.ENUM('PERCENT', 'FIXED_PRICE')
+    type: DataTypes.ENUM('PERCENT', 'FIXED_PRICE'),
+    image_url: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Deal',
