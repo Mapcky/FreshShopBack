@@ -132,3 +132,8 @@ exports.cleanCart = async (cartId, transaction) => {
         transaction
     })
 }
+
+
+exports.validatePrices = async (req, res) => {
+    
+}
