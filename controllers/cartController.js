@@ -15,12 +15,12 @@ exports.loadCart = async (req, res) => {
                 {
                     model: models.CartItem,
                     as: 'cartItems',
-                    attributes: ['id', 'cart_id', 'product_id', 'quantity'],
+                    attributes: ['id', 'cart_id', 'product_id', 'quantity','unit_price'],
                     include: [
                         {
                             model: models.Product,
                             as: 'Product',
-                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity','description']
+                            attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity', 'description']
                         }
                     ]
                 }
@@ -43,7 +43,7 @@ exports.loadCart = async (req, res) => {
 exports.addCartItem = async (req, res) => {
 
     const userId = req.userId
-    const { productId, quantity } = req.body
+    const { productId, quantity, unitPrice } = req.body
 
     try {
 
@@ -53,18 +53,28 @@ exports.addCartItem = async (req, res) => {
             }
         })
 
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found', success: false });
+        }
+
         const [cartItem, created] = await models.CartItem.findOrCreate({
             where: {
                 cart_id: cart.id,
-                product_id: productId
+                product_id: productId,
             },
-            defaults: { quantity }
+            defaults: {
+                quantity,
+                unit_price: unitPrice
+            }
         })
 
         const product = await models.Product.findByPk(productId)
 
         if (!created) {
             //item already exists
+
+            //set unit_price to current price
+            cartItem.unit_price = unitPrice;
 
             //don't want to superpass the product stock, temporal solution
             const avaliableStock = product.quantity - cartItem.quantity
@@ -84,12 +94,12 @@ exports.addCartItem = async (req, res) => {
             where: {
                 id: cartItem.id
             },
-            attributes: ['id', 'cart_id', 'product_id', 'quantity'],
+            attributes: ['id', 'cart_id', 'product_id', 'quantity', 'unit_price'],
             include: [
                 {
                     model: models.Product,
                     as: 'Product',
-                    attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity','description']
+                    attributes: ['id', 'name', 'price', 'image_url', 'category_id', 'quantity', 'description']
                 }
             ]
         })
@@ -115,25 +125,31 @@ exports.removeCartItem = async (req, res) => {
         })
 
         if (!deletedItem) {
-            return res.status(404).json({ message: 'Cart item not found', success: false})
+            return res.status(404).json({ message: 'Cart item not found', success: false })
         }
 
         res.status(200).json({ success: true })
 
     } catch (error) {
-        return res.status(500).json({ message: 'An error ocurred while removing the cart item', success: false})
+        return res.status(500).json({ message: 'An error ocurred while removing the cart item', success: false })
     }
 }
 
 
 exports.cleanCart = async (cartId, transaction) => {
     return await models.CartItem.destroy({
-        where: {cart_id: cartId},
+        where: { cart_id: cartId },
         transaction
     })
 }
 
 
 exports.validatePrices = async (req, res) => {
-    
+    const { cartId } = req.body
+
+    try {
+
+    } catch (error) {
+        return res.status(500).json({ message: 'An error ocurred while updating cart items', success: false })
+    }
 }

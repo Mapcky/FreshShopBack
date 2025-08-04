@@ -91,7 +91,7 @@ exports.loadOrders = async (req, res) => {
                 {
                     model: models.OrderItem,
                     as: 'orderItems',
-                    attributes: ['id', 'order_id', 'product_id', 'quantity'],
+                    attributes: ['id', 'order_id', 'product_id', 'quantity', 'unit_price'],
                     include: [
                         {
                             model: models.Product,
