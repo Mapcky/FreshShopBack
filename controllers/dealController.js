@@ -73,3 +73,37 @@ exports.getActiveDeals = async (req, res) => {
         res.status(500).json({ message: "Error retrieving deals information", success: false })
     }
 }
+
+
+exports.productActiveDeal = async(req, res) => {
+
+    const productId  = req.params.id
+    const now = new Date();
+    try {
+
+        const dealItem = await models.DealItem.findOne({
+            where: { product_id: productId 
+            },
+            attributes: ['id', 'deal_id', 'product_id', 'value'],
+            include: [{
+                model: models.Deal,
+                attributes: ['id', 'name', 'starting_date', 'finish_date', 'type', 'image_url'],
+                                where: {
+                    starting_date: { [models.Sequelize.Op.lte]: now },
+                    finish_date: { [models.Sequelize.Op.gte]: now }
+                }
+            }]
+        })
+
+        if (!dealItem) {
+            return res.status(404).json({ message: "No active deal found for this product", success: false });
+        }
+
+        
+        res.json({dealItem, success: true });
+
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ message: "Error retrieving deal information", success: false })
+    }
+}
